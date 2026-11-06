@@ -1,25 +1,34 @@
 package com.lrz.grovecore.web;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
  * @author lirenzhi
  * @since 2023/3/16 2:42 PM
  */
-@WebFilter
-public class HttpBindFilter implements Filter {
+public class HttpBindFilter extends OncePerRequestFilter {
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        try {
+            HttpServletContext.setContext(request, response);
+            filterChain.doFilter(request, response);
+        } finally {
+            HttpServletContext.removeContext();
+        }
+    }
 
-        HttpServletContext.setContext(request, response);
-        filterChain.doFilter(servletRequest, servletResponse);
-        HttpServletContext.removeContext();
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldNotFilterErrorDispatch() {
+        return false;
     }
 }

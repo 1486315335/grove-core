@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
- * 分布式锁上下文
+ * 分布式锁上下文。只有成功获得锁才执行回调，执行后释放锁并清理当前任务名。
+ * 未获得锁时跳过回调；getWithDistributedLock 返回 null。
  *
  * @author lirenzhi
  * @since 2022/12/13 2:31 下午
@@ -32,24 +33,17 @@ public class DistributedLockContext {
     public static void doWithDistributedLock(String key, Executable executable) {
         DistributedLock distributedLock = ApplicationContextHolder.getBean(DistributedLock.class);
         LockHolder lockHolder = distributedLock.tryLock(key);
-        if (lockHolder.isLocked()) {
-            doConsumer(key, executable, lockHolder);
-        } else {
-            //调用此方法，表明，你只是想抢一次锁，抢不到算了
-            if (nameThreadLocal.get() != null) {
-                log.info("执行[{}]因为未抢到分布式锁，被跳过", nameThreadLocal.get());
-            } else {
-                log.info("未抢到分布式锁，被跳过");
-            }
-        }
+        doConsumer(key, executable, lockHolder);
     }
 
     private static void doConsumer(String key, Executable executable, LockHolder lockHolder) {
+        if (!lockHolder.isLocked()) {
+            logSkipped();
+            return;
+        }
         long start = System.currentTimeMillis();
         try {
-            if (nameThreadLocal.get() != null) {
-                log.info("分布式锁环境下执行[{}] 开始", nameThreadLocal.get());
-            }
+            log();
             executable.execute();
         } finally {
             String elapsed = ElapsedTimeUtil.elapsedTimeFrom(start);
@@ -59,7 +53,6 @@ public class DistributedLockContext {
                 log.info("释放分布式锁：{}，占用：{}", key, elapsed);
             }
             lockHolder.releaseLock();
-            nameThreadLocal.remove();
         }
     }
 
@@ -76,10 +69,12 @@ public class DistributedLockContext {
     }
 
     private static <E> E doSupplier(String key, Supplier<E> supplier, LockHolder lockHolder) {
+        if (!lockHolder.isLocked()) {
+            logSkipped();
+            return null;
+        }
         try {
-            if (nameThreadLocal.get() != null) {
-                log.info("分布式锁环境下执行[{}] 开始", nameThreadLocal.get());
-            }
+            log();
             return supplier.get();
         } finally {
             if (nameThreadLocal.get() != null) {
@@ -88,7 +83,20 @@ public class DistributedLockContext {
                 log.info("释放分布式锁：{}", key);
             }
             lockHolder.releaseLock();
-            nameThreadLocal.remove();
+        }
+    }
+
+    private static void logSkipped() {
+        if (nameThreadLocal.get() != null) {
+            log.info("执行[{}]因为未抢到分布式锁，被跳过", nameThreadLocal.get());
+        } else {
+            log.info("未抢到分布式锁，被跳过");
+        }
+    }
+
+    private static void log() {
+        if (nameThreadLocal.get() != null) {
+            log.info("分布式锁环境下执行[{}] 开始", nameThreadLocal.get());
         }
     }
 }

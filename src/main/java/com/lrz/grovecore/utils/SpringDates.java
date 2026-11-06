@@ -1,8 +1,8 @@
 package com.lrz.grovecore.utils;
 
+import com.lrz.grovecore.convert.GroveDateConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
@@ -55,14 +55,14 @@ public final class SpringDates {
 
         public DateValueWrapper asDate() {
             return doAs(value, value -> {
-                Date date = ApplicationContextHolder.getBean(ConversionService.class).convert(value, Date.class);
+                Date date = ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, Date.class);
                 return new DateValueWrapper(date);
             });
         }
 
         public LocalDateValueWrapper asLocalDate() {
             return doAs(value, value -> {
-                LocalDate convert = ApplicationContextHolder.getBean(ConversionService.class).convert(value, LocalDate.class);
+                LocalDate convert = ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, LocalDate.class);
                 return new LocalDateValueWrapper(convert);
             });
         }
@@ -70,21 +70,21 @@ public final class SpringDates {
         public LocalDateTimeValueWrapper asLocalDateTime() {
             return doAs(value, value -> {
                 value = DateUtil.prepareDateText(value);
-                LocalDateTime convert = ApplicationContextHolder.getBean(ConversionService.class).convert(value, LocalDateTime.class);
+                LocalDateTime convert = ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, LocalDateTime.class);
                 return new LocalDateTimeValueWrapper(convert);
             });
         }
 
         public OffsetDateTimeValueWrapper asOffsetDateTime() {
             return doAs(value, value -> {
-                OffsetDateTime convert = ApplicationContextHolder.getBean(ConversionService.class).convert(value, OffsetDateTime.class);
+                OffsetDateTime convert = ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, OffsetDateTime.class);
                 return new OffsetDateTimeValueWrapper(convert);
             });
         }
 
         public ZonedDateTimeValueWrapper asZonedDateTime() {
             return doAs(value, value -> {
-                ZonedDateTime convert = ApplicationContextHolder.getBean(ConversionService.class).convert(value, ZonedDateTime.class);
+                ZonedDateTime convert = ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, ZonedDateTime.class);
                 return new ZonedDateTimeValueWrapper(convert);
             });
         }
@@ -136,7 +136,7 @@ public final class SpringDates {
                 if (value.getClass() == dateClass) {
                     return (X) value;
                 }
-                return ApplicationContextHolder.getBean(ConversionService.class).convert(value, dateClass);
+                return ApplicationContextHolder.getBean(GroveDateConverter.class).convert(value, dateClass);
             }
         }
 

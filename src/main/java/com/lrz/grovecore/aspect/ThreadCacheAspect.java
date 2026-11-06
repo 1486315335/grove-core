@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.mvel2.MVEL;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -25,17 +24,19 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Slf4j
 @Aspect
-@Component
 public class ThreadCacheAspect {
 
     private static final ConcurrentMap<String, Serializable> expressionCache = Maps.newConcurrentMap();
 
-    @Pointcut("@annotation(com.lrz.grovecore.annotation.RequestCached))")
+    @Pointcut("@annotation(com.lrz.grovecore.annotation.RequestCached)")
     public void pointCut() {
     }
 
-    @Around("pointCut()&&@annotation(requestCached)")
+    @Around(value = "pointCut() && @annotation(requestCached)", argNames = "joinPoint,requestCached")
     public Object around(ProceedingJoinPoint joinPoint, RequestCached requestCached) throws Throwable {
+        if (!RequestCacheContext.isActive()) {
+            return joinPoint.proceed();
+        }
 
         String cacheKey = createCacheKey(joinPoint, requestCached);
 
@@ -77,11 +78,6 @@ public class ThreadCacheAspect {
     }
 
     private Serializable loadExpressionFromCache(String key) {
-        if (expressionCache.containsKey(key)) {
-            return expressionCache.get(key);
-        }
-        Serializable serializable = MVEL.compileExpression(key);
-        expressionCache.put(key, serializable);
-        return serializable;
+        return expressionCache.computeIfAbsent(key, MVEL::compileExpression);
     }
 }

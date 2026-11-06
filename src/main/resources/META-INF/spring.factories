@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.lrz.grovecore.autoconfigure.SpringDatesAutoConfiguration,\
+com.lrz.grovecore.autoconfigure.HttpServletContextAutoConfiguration,\
+com.lrz.grovecore.autoconfigure.RequestCacheAutoConfiguration,\
+com.lrz.grovecore.autoconfigure.DistributedLockAutoConfiguration

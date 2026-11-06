@@ -62,7 +62,7 @@ public final class ExceptionUtil {
                 sb.append("\r\n\t").append(element);
             }
         }
-        return sb.isEmpty() ? "" : sb.toString();
+        return sb.length() == 0 ? "" : sb.toString();
     }
 
     /**

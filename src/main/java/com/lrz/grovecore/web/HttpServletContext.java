@@ -1,13 +1,14 @@
 package com.lrz.grovecore.web;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
 
 /**
- * http请求上下文
+ * HTTP 请求线程的上下文，由 HttpBindFilter 绑定并在当前分派结束后清理。
+ * 不会自动传递到 @Async、自建线程或线程池任务中。
  *
  * @author lirenzhi
  * @since 2023/3/16 1:50 PM

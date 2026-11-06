@@ -1,6 +1,6 @@
 package com.lrz.grovecore.listener;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 
 /**
  * @author lirenzhi
