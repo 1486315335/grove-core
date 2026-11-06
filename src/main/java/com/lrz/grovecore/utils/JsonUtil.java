@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.google.common.base.Strings;
+import com.lrz.grovecore.exception.JsonParseException;
 import com.lrz.grovecore.json.ObjectMapperDateFormatExtend;
 import com.lrz.grovecore.json.ObjectMapperLocalDateTimeDeserializerExtend;
 import lombok.SneakyThrows;
@@ -153,7 +154,7 @@ public final class JsonUtil {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             log.error("json转换失败，原对象：{}，原因：{}", object.getClass(), e.getMessage());
-            throw new RuntimeException(JSON_CONVERT_ERROR.getMessage());
+            throw new JsonParseException(JSON_CONVERT_ERROR.getMessage());
         }
     }
 
@@ -202,7 +203,7 @@ public final class JsonUtil {
             return OBJECT_MAPPER.readValue(json, javaType);
         } catch (JsonProcessingException e) {
             log.error("Json转换为对象失败，原Json串为：{}，原因为：{}", json, e.getMessage());
-            throw new RuntimeException(JSON_CONVERT_ERROR.getMessage());
+            throw new JsonParseException(JSON_CONVERT_ERROR.getMessage());
         }
     }
 
@@ -214,7 +215,7 @@ public final class JsonUtil {
             return OBJECT_MAPPER.readTree(json);
         } catch (IOException e) {
             log.error("Json转换为对象失败，原Json串为：{}，原因为：{}", json, e.getMessage());
-            throw new RuntimeException(JSON_CONVERT_ERROR.getMessage());
+            throw new JsonParseException(JSON_CONVERT_ERROR.getMessage());
         }
     }
 

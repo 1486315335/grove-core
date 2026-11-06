@@ -3,6 +3,7 @@ package com.lrz.grovecore.utils;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 import com.lrz.grovecore.envm.ErrorCodeEnum;
+import com.lrz.grovecore.exception.SplitParametersException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -54,7 +55,7 @@ public final class ListUtil {
      * @return {@link List}<{@link List}<{@link T}>>
      */
     public static <T> List<List<T>> splitList(List<T> source, int range) {
-        if (range <= 0) throw new RuntimeException(ErrorCodeEnum.SPLITTING_PARAMETER_EXCEPTION.getMessage());
+        if (range <= 0) throw new SplitParametersException(ErrorCodeEnum.SPLITTING_PARAMETER_EXCEPTION.getMessage());
         if (null == source || source.isEmpty()) return Collections.emptyList();
 
         List<List<T>> result = new ArrayList<>();
